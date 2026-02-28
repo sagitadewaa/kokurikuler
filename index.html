@@ -1,115 +1,437 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Portal Kokurikuler</title>
-  
-<link rel="stylesheet" href="assets/css/style.css">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <base target="_top">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+  :root{
+    --bg1:#0ea5e9;       /* sky */
+    --bg2:#22c55e;       /* green */
+    --card:#ffffff;
+    --text:#0f172a;
+    --muted:#64748b;
+    --border:rgba(15,23,42,.10);
+    --shadow: 0 12px 28px rgba(2,6,23,.10);
+    --shadow2: 0 6px 16px rgba(2,6,23,.08);
+    --radius: 16px;
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; }
+
+  body{
+    font-family:'Poppins',sans-serif;
+    color:var(--text);
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:18px 12px;
+
+    /* background gradient ringan (tanpa gambar) */
+    background:
+      radial-gradient(900px 500px at 15% 15%, rgba(14,165,233,.20), transparent 55%),
+      radial-gradient(900px 500px at 85% 20%, rgba(34,197,94,.18), transparent 55%),
+      linear-gradient(180deg, #f8fafc, #eef2ff);
+  }
+
+  .container{
+    width:100%;
+    max-width:380px;
+    background: rgba(255,255,255,.92);
+    border:1px solid var(--border);
+    border-radius: var(--radius);
+    padding:18px;
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(10px);
+    margin-top:auto;
+  }
+
+  h1{
+    text-align:center;
+    font-weight:600;
+    font-size:1.05rem;
+    line-height:1.35;
+    margin-bottom:14px;
+    letter-spacing:.2px;
+  }
+
+  /* header badge kecil */
+  h1::after{
+    content:"QR Camera Attendance";
+    display:block;
+    margin:10px auto 0;
+    width:max-content;
+    font-size:.72rem;
+    font-weight:500;
+    color: rgba(15,23,42,.72);
+    background: rgba(14,165,233,.10);
+    border:1px solid rgba(14,165,233,.18);
+    padding:6px 10px;
+    border-radius:999px;
+  }
+
+  .tabs{
+    display:flex;
+    gap:10px;
+    margin:14px 0 12px;
+    background: transparent;
+  }
+
+  .tab{
+    flex:1;
+    text-align:center;
+    padding:10px 12px;
+    border-radius:12px;
+    border:1px solid var(--border);
+    background: rgba(255,255,255,.7);
+    color: var(--text);
+    font-weight:600;
+    font-size:.88rem;
+    cursor:default; /* karena kamu memang hanya 1 tab */
+    user-select:none;
+    box-shadow: var(--shadow2);
+  }
+  .tab.active{
+    border-color: rgba(14,165,233,.25);
+    background: linear-gradient(135deg, rgba(14,165,233,.18), rgba(34,197,94,.14));
+  }
+  .tab.inactive{
+    opacity:0; /* jangan bikin tulisannya hilang */
+  }
+
+  .tab-content{ display:none; }
+  .tab-content.active{ display:block; }
+
+  button{
+    width:100%;
+    padding:11px 12px;
+    border-radius:12px;
+    border:1px solid rgba(2,6,23,.08);
+    background: linear-gradient(135deg, rgba(14,165,233,1), rgba(34,197,94,1));
+    color:white;
+    font-weight:600;
+    font-size:.95rem;
+    cursor:pointer;
+    box-shadow: 0 10px 18px rgba(14,165,233,.18);
+    transition: transform .15s ease, filter .2s ease, box-shadow .2s ease;
+  }
+  button:hover{ filter: brightness(1.03); box-shadow: 0 14px 26px rgba(14,165,233,.20); }
+  button:active{ transform: translateY(1px); }
+
+  button:disabled{
+    cursor:not-allowed;
+    background: #cbd5e1;
+    color: #475569;
+    box-shadow:none;
+  }
+
+  /* camera preview card */
+  #camera-stream{
+    width:100%;
+    max-width:none;
+    margin:12px 0 0;
+    display:none;
+    border-radius: 14px;
+    border:1px solid var(--border);
+    background:#0b1220;
+    box-shadow: var(--shadow2);
+  }
+
+  /* result box */
+  #result{
+    margin-top:14px;
+    padding:12px 12px;
+    border-radius:14px;
+    text-align:center;
+    font-size:14px;
+    border:1px solid var(--border);
+    background: rgba(255,255,255,.8);
+    box-shadow: var(--shadow2);
+  }
+  #result:empty{
+    display:none; /* kalau kosong, hilang biar clean */
+  }
+
+  .success{
+    border-color: rgba(34,197,94,.25) !important;
+    background: rgba(34,197,94,.10) !important;
+    color:#065f46;
+  }
+  .error{
+    border-color: rgba(239,68,68,.25) !important;
+    background: rgba(239,68,68,.10) !important;
+    color:#7f1d1d;
+  }
+
+  #result img{
+    display:block;
+    margin:10px auto 0;
+    max-width:100px;
+    height:auto;
+    border-radius:10px;
+    border:1px solid rgba(2,6,23,.08);
+    background:white;
+    padding:6px;
+  }
+
+  .copyright{
+    margin-top:14px;
+    margin-bottom:auto;
+    text-align:center;
+    font-size:12px;
+    color: var(--muted);
+    opacity:.9;
+  }
+
+  /* =========================
+     MODAL BLOCKED (tetap)
+     ========================= */
+  /* pop up disable */
+  .modal-overlay{
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 14px;
+  }
+
+  .modal-box{
+    background: rgba(255,255,255,.96);
+    border: 1px solid rgba(255,255,255,.55);
+    border-radius: 16px;
+    padding: 18px 16px;
+    width: 100%;
+    max-width: 360px;
+    text-align: center;
+    animation: popIn .28s ease;
+    box-shadow: 0 18px 40px rgba(0,0,0,.25);
+    backdrop-filter: blur(10px);
+  }
+  .logo {
+    width: 100px;
+    height: auto;
+    display: block; 
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .modal-icon{ font-size: 44px; margin-bottom: 6px; }
+  .modal-box h2{ margin-bottom: 6px; color: #b91c1c; font-size: 18px; }
+  .modal-box p{ font-size: 14px; color: #334155; margin-bottom: 0; }
+
+  @keyframes popIn{
+    from{ transform: translateY(8px) scale(.98); opacity: 0; }
+    to  { transform: translateY(0) scale(1); opacity: 1; }
+  }
+</style>
 
 </head>
-
 <body>
+    <div class="container">
+      <p><img class="logo" src="https://i.ibb.co.com/sdV75wcH/Logo.png"> </p>
+        <h1>Attendance System Praktek<br>
+        SMK Bintang Persada Denpasar<br>
+        TAHUN 2025/2026</h1>
+        
+        <div class="tabs">
+            <div class="tab inactive">Scan Attendance</div> 
+            <!-- <h1><center><strong>Scan Attendance</strong></center></h1> -->
+        </div>
+        <!-- <h1><center><strong>Scan Attendance</strong></center></h1> -->
+        <div id="scanTab" class="tab-content active">
+            <!-- <button onclick="toggleCamera()">Start Absen</button> -->
+            <!-- <button id="autoClickBtn" onclick="toggleCamera()">Click Me</button> --> <!-- Untuk Auto Camera -->
+            <!-- <button onclick="toggleCamera()">Start Absen</button> -->
+            <button id="startBtn" onclick="toggleCamera()">Start Absen</button>
+            <p>&nbsp;</p>
+            <video id="camera-stream" autoplay playsinline></video>
+            <canvas id="canvas" style="display:none;"></canvas>
+        </div>
+        
+        <div id="result"></div>
+    </div>
+    
+    <div class="copyright">
+        &copy; 2025 Script by @anggasagita99
+    </div>
+    <!-- POPUP BLOCKED -->
+    <div id="blockedModal" class="modal-overlay" style="display:none;">
+      <div class="modal-box">
+        <div class="modal-icon">🚫</div>
+        <h2>Akses Ditolak</h2>
+        <strong><p id="blockedText"></p></strong>
+        <!-- <button class="modal-btn" onclick="closeBlockedModal()">Tutup</button> -->
+      </div>
+    </div>
 
-<div class="wrap">
 
-<div class="brand">
-<img src="assets/img/logo.png" class="logo">
-<div>
-<h1 class="title">PORTAL KOKURIKULER</h1>
-<div class="subtitle">SMK Bintang Persada Denpasar</div>
-</div>
-</div>
 
-<div class="hero">
-<h3>Dashboard Kokurikuler</h3>
-<p>Pilih menu di bawah ini.</p>
-</div>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.3.1/dist/jsQR.min.js"></script>
+    <script>
+        let cameraActive = false;
+        let isProcessing = false;
+        const video = document.getElementById('camera-stream');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
 
-<div class="card p-4">
+        function showTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            document.querySelector(`.tab:nth-child(${tabName === 'scan' ? '1' : '2'}`).classList.add('active');
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            clearResult();
+        }
 
-<!-- INPUT -->
-<div class="group">
-<button class="group-btn">📥 INPUT PESERTA</button>
-<div class="group-menu">
-<a class="menu-link" href="input-ekstra.html">Input Ekstrakurikuler</a>
-<a class="menu-link" href="input-mapil.html">Input Mapel Pilihan</a>
-</div>
-</div>
+        function toggleCamera() {
+            if (cameraActive) {
+                stopCamera();
+            } else {
+                startCamera();
+            }
+        }
 
-<!-- ABSEN EKSTRA -->
-<div class="group">
-<button class="group-btn">🏸 ABSEN EKSTRAKURIKULER</button>
-<div class="group-menu">
-<a class="menu-link" href="ekstra/badminton.html">Ekstra Badminton</a>
-<a class="menu-link" href="ekstra/futsal.html">Ekstra Futsal</a>
-<a class="menu-link" href="ekstra/teater.html">Ekstra Teater</a>
-<a class="menu-link" href="ekstra/esport.html">Ekstra E-Sport</a>
-<a class="menu-link" href="ekstra/padus.html">Paduan Suara</a>
-<a class="menu-link" href="ekstra/dance.html">Ekstra Dance</a>
-<a class="menu-link" href="ekstra/tari.html">Tari Tradisional</a>
-<a class="menu-link" href="ekstra/english.html">English Club</a>
-<a class="menu-link" href="ekstra/nyurat.html">Nyurat Lontar</a>
-<a class="menu-link" href="ekstra/jurnalistik.html">Jurnalistik</a>
-<a class="menu-link" href="ekstra/kkr.html">KKR</a>
-<a class="menu-link" href="ekstra/pramuka.html">Pramuka</a>
-<a class="menu-link" href="ekstra/marching.html">Marching Band</a>
-<a class="menu-link" href="ekstra/tatarias.html">Tata Rias</a>
-<a class="menu-link" href="ekstra/tarung.html">Tarung Derajat</a>
-<a class="menu-link" href="ekstra/silat.html">Pencak Silat</a>
-<a class="menu-link" href="ekstra/kwu.html">KWU & KIR</a>
-<a class="menu-link" href="ekstra/volly.html">Volly</a>
-</div>
-</div>
+        function startCamera() {
+            isProcessing = false; // biar siap scan lagi
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+                .then(function(stream) {
+                    video.srcObject = stream;
+                    video.setAttribute("playsinline", true);
+                    video.style.display = 'block';
+                    video.play();
+                    cameraActive = true;
+                    document.querySelector('#scanTab button').textContent = 'Stop Camera';
+                    requestAnimationFrame(tick);
+                })
+                .catch(function(error) {
+                    console.error("Error accessing the camera", error);
+                });
+        }
 
-<!-- ABSEN MAPEL -->
-<div class="group">
-<button class="group-btn">📚 ABSEN MAPEL PILIHAN</button>
-<div class="group-menu">
-<a class="menu-link" href="mapel/farmasi.html">Farmasi Industri</a>
-<a class="menu-link" href="mapel/kdm.html">Layanan Penunjang KDM</a>
-<a class="menu-link" href="mapel/bandara.html">Pengantar Kebandaraan</a>
-<a class="menu-link" href="mapel/fb.html">F&B</a>
-<a class="menu-link" href="mapel/jepang.html">Bahasa Jepang</a>
-<a class="menu-link" href="mapel/inggris.html">Bahasa Inggris Lanjutan</a>
-</div>
-</div>
+        function stopCamera() {
+            if (video.srcObject) {
+                video.srcObject.getTracks().forEach(track => track.stop());
+            }
+            video.style.display = 'none';
+            cameraActive = false;
+            document.querySelector('#scanTab button').textContent = 'Start Camera';
+        }
 
-<!-- REKAP -->
-<div class="group">
-<button class="group-btn">📊 REKAP ABSEN</button>
-<div class="group-menu">
-<a class="menu-link" target="_blank"
-href="https://docs.google.com/spreadsheets/d/1S909gfqUtLypTB44zdh4qXKHDdmqS1T_d3B7w_uuz8o/edit?gid=215947244">
-Rekap Ekstrakurikuler
-</a>
-<a class="menu-link" target="_blank"
-href="https://docs.google.com/spreadsheets/d/1S909gfqUtLypTB44zdh4qXKHDdmqS1T_d3B7w_uuz8o/edit?gid=1397686535">
-Rekap Mapel Pilihan
-</a>
-</div>
-</div>
+        function tick() {
+            if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                canvas.height = video.videoHeight;
+                canvas.width = video.videoWidth;
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                var code = jsQR(imageData.data, imageData.width, imageData.height, {
+                    inversionAttempts: "dontInvert",
+                });
+                if (code) {
+                    console.log("Found QR code", code.data);
+                    stopCamera();
+                    processBarcode(code.data);
+                }
+            }
+            if (cameraActive) {
+                requestAnimationFrame(tick);
+            }
+        }
 
-</div>
+        function processBarcode(barcode) {
+          if (isProcessing) return;     // <--- cegah double call
+          isProcessing = true;
 
-<div class="footer">
-© 2026 SMK Bintang Persada Denpasar
-</div>
+            if (!barcode) {
+                barcode = document.getElementById('barcodeInput').value;
+            }
+            if (!barcode) {
+                alert('Please enter a barcode');
+                return;
+            }
+            var resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Processing...';
+            resultDiv.className = '';
 
-</div>
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    if (result.success) {
+                        resultDiv.innerHTML = `
+                            <strong>Attendance recorded successfully</strong><br>
+                            Nama : ${result.name}<br>
+                            Kelas : ${result.kelas}<br>
+                            Jurusan : ${result.jurusan}<br>
+                            Tanggal : ${result.date}<br>
+                            Jam : ${result.time}<br>
+                            Sesi : ${result.sesi}<br>
+                            Status Kehadiran : ${result.praktekHarian}<br>
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(result.barcode)}" alt="QR Code">
+                        `;
+                        resultDiv.className = 'success';
+                        // google.script.run
+                        // .withSuccessHandler(function(url){
+                        //   // setTimeout("window.open(self.location, '_self');", 5000);
+                        // setTimeout("window.open('https://script.google.com/macros/s/AKfycbyDkpP_3IHWIhErTNrex5jvMCF4MdHq6or0CnWg5LM/dev?&page=Index');",3000);
+                        // })
+                        // .getScriptURL();
+                    } else {
+                        resultDiv.innerHTML = result.message;
+                        resultDiv.className = 'error';
+                    }
+                    document.getElementById('barcodeInput').value = '';
+                    isProcessing = false;     // <--- balikin normal
+                })
+                .withFailureHandler(function(error) {
+                    resultDiv.innerHTML = 'Error: ' + error;
+                    resultDiv.className = 'error';
+                    isProcessing = false;     // <--- balikin normal
+                })
+                .processAttendancePraktek(barcode);
+        }
 
-<script>
-document.querySelectorAll(".group-btn").forEach(btn=>{
-  btn.addEventListener("click", function(){
-    const group=this.parentElement;
-    document.querySelectorAll(".group").forEach(g=>{
-      if(g!==group) g.classList.remove("open");
-    });
-    group.classList.toggle("open");
-  });
-});
-</script>
+        function clearResult() {
+            document.getElementById('result').innerHTML = '';
+            document.getElementById('result').className = '';
+        }
+
+        // Initialize tabs
+        showTab('scan');
+
+        // Clear result when switching tabs or starting camera
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', clearResult);
+        });
+        document.querySelector('#scanTab button').addEventListener('click', clearResult);
+        // allowed day
+
+        const ALLOWED_DAY = <?!= ALLOWED_DAY ?>;
+        const BLOCK_REASON = <?!= JSON.stringify(BLOCK_REASON) ?>;
+
+        function showBlockedModal(msg) {
+          document.getElementById("blockedText").innerHTML = msg || "Akses tidak diijinkan.";
+          document.getElementById("blockedModal").style.display = "flex";
+        }
+
+        function closeBlockedModal() {
+          document.getElementById("blockedModal").style.display = "none";
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+          if (!ALLOWED_DAY) {
+            const btn = document.getElementById("startBtn");
+            btn.disabled = true;
+            btn.textContent = "Absen Ditutup";
+            showBlockedModal(BLOCK_REASON);
+            if (typeof stopCamera === "function") stopCamera();
+          }
+        });
+    </script>
 
 </body>
 </html>
