@@ -1,0 +1,332 @@
+* { box-sizing: border-box; }
+    html, body { height: 100%; }
+
+    .page-shell{
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .page-content{
+      flex: 1; /* ini yang mendorong footer ke bawah */
+    }
+    /* body{
+      background: linear-gradient(180deg, #f6f9ff 0%, #ffffff 45%, #f7f7fb 100%);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    } */
+
+    body{
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    background:
+      linear-gradient(
+        rgba(15,23,42,.55),
+        rgba(15,23,42,.55)
+      ),
+      url("https://images.unsplash.com/photo-1497366216548-37526070297c") center/cover no-repeat fixed;
+    color:#f8fafc;
+    background-color:#f1f5f9;
+    }
+
+    .card, .group{
+      background: rgba(255,255,255,.12);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,.18);
+    }
+
+    .page-wrap{
+      max-width: 860px;
+      margin: 18px auto 40px;
+      padding: 0 14px;
+    }
+
+    .brand{
+      display:flex;
+      gap:14px;
+      align-items:center;
+      justify-content:center;
+      margin: 10px 0 6px;
+      flex-wrap: wrap;
+      text-align:center;
+    }
+    .logo{
+      width: 120px;
+      height: 120px;
+      object-fit: contain;
+      border-radius: 18px;
+      background:#fff;
+      box-shadow: 0 10px 25px rgba(0,0,0,.08);
+      padding: 10px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .school-name{
+      font-weight: 800;
+      font-size: 22px;
+      letter-spacing: .4px;
+      margin: 0;
+      line-height: 1.15;
+    }
+    .school-sub{
+      margin: 2px 0 0;
+      opacity:.7;
+      font-size: 13px;
+    }
+
+    .hero{
+      margin-top: 14px;
+      border-radius: 18px;
+      padding: 16px 16px;
+      color: #fff;
+      background: linear-gradient(135deg, #ff8c00 0%, #ff5f6d 55%, #7c3aed 120%);
+      box-shadow: 0 16px 35px rgba(124,58,237,.18);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero:before{
+      content:"";
+      position:absolute;
+      inset:-60px -50px auto auto;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, rgba(255,255,255,.25) 0%, rgba(255,255,255,0) 60%);
+      transform: rotate(18deg);
+    }
+    .hero-title{
+      margin:0;
+      font-weight: 900;
+      font-size: 18px;
+      letter-spacing:.4px;
+    }
+    .hero-sub{
+      margin: 2px 0 0;
+      font-size: 18px;
+      opacity: .9;
+    }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      background: rgba(255,255,255,.18);
+      border: 1px solid rgba(255,255,255,.25);
+      padding: 6px 10px;
+      border-radius: 999px;
+      margin-top: 10px;
+      font-size: 12px;
+      width: fit-content;
+    }
+
+    .card{
+      margin-top: 14px;
+      background:#fff;
+      border-radius: 18px;
+      box-shadow: 0 14px 30px rgba(17,24,39,.08);
+      border: 1px solid rgba(15,23,42,.06);
+      overflow: hidden;
+    }
+    .card-head{
+      padding: 14px 16px;
+      background: linear-gradient(90deg, rgba(175,238,238,.55), rgba(255,255,255,.8));
+      border-bottom: 1px solid rgba(15,23,42,.06);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      border-top-left-radius: 18px;
+    border-top-right-radius: 18px;
+    }
+    .card-head h3{
+      margin:0;
+      font-size: 15px;
+      font-weight: 800;
+    }
+    .card-body{
+      padding: 14px 16px 16px;
+      border-bottom-left-radius: 18px;
+    border-bottom-right-radius: 18px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .footer-minimal{
+    margin-top: 32px;
+    padding: 8px 8px;
+    text-align: center;
+    background: linear-gradient(180deg, #f8fafc, #eef2ff);
+    border-top: 1px solid rgba(15,23,42,.08);
+    font-size: 13px;
+    color: #0f172a;
+  }
+
+  .footer-minimal .footer-sub{
+    display:block;
+    margin-top:4px;
+    font-size:12px;
+    opacity:.65;
+  }
+
+    @media (max-width: 640px){
+      .grid{ grid-template-columns: 1fr; }
+      .logo{ width:92px; height:92px; }
+      .school-name{ font-size: 18px; }
+    }
+
+    .field label{
+      display:block;
+      font-size: 12px;
+      font-weight: 800;
+      color: #0f172a;
+      margin: 0 0 6px;
+    }
+
+    .input-wrap{
+      position: relative;
+    }
+    .input-wrap i{
+      position:absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      opacity: .55;
+      pointer-events:none;
+    }
+
+    .form-control,
+    select.form-control,
+    input.form-control{
+      width: 100%;
+      padding: 11px 12px 11px 38px;
+      border-radius: 12px;
+      border: 1px solid rgba(15,23,42,.14);
+      background: #fff;
+      transition: .15s ease;
+      box-shadow: none;
+    }
+    textarea.form-control{
+      padding-left: 38px;
+      min-height: 90px;
+      resize: vertical;
+    }
+    .form-control:focus{
+      outline: none;
+      border-color: rgba(124,58,237,.45);
+      box-shadow: 0 0 0 4px rgba(124,58,237,.12);
+    }
+
+    /* Select lebih keren */
+    select.form-control{
+      appearance: none;
+      background-image:
+        linear-gradient(45deg, transparent 50%, rgba(15,23,42,.55) 50%),
+        linear-gradient(135deg, rgba(15,23,42,.55) 50%, transparent 50%),
+        linear-gradient(to right, transparent, transparent);
+      background-position:
+        calc(100% - 18px) calc(1em + 2px),
+        calc(100% - 13px) calc(1em + 2px),
+        100% 0;
+      background-size: 5px 5px, 5px 5px, 2.5em 2.5em;
+      background-repeat: no-repeat;
+      padding-right: 42px;
+    }
+
+    .actions{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    @media (max-width: 640px){
+      .actions{ grid-template-columns: 1fr; }
+    }
+
+    .btn{
+      border-radius: 12px !important;
+      padding: 11px 14px !important;
+      font-weight: 800 !important;
+    }
+
+    .btn-success{
+      box-shadow: 0 12px 25px rgba(16,185,129,.20);
+    }
+    .btn-primary{
+      box-shadow: 0 12px 25px rgba(59,130,246,.18);
+    }
+    /* Rapihin tinggi & radius Tom Select agar match Bootstrap 5 */
+    .ts-control{
+      border-radius: 12px !important;
+      padding: 10px 12px !important;
+      border-color: rgba(15,23,42,.14) !important;
+    }
+    .ts-control:focus-within{
+      box-shadow: 0 0 0 4px rgba(124,58,237,.12) !important;
+      border-color: rgba(124,58,237,.45) !important;
+    }
+    .ts-dropdown{
+      border-radius: 12px !important;
+      overflow: hidden;
+    }
+
+      /* Rapihin item & option */
+    .ts-wrapper .ts-control{
+      min-height: 44px;
+      padding: 8px 10px;
+    }
+
+    .ts-dropdown .option{
+      padding: 10px 12px;
+    }
+
+    /* Layout icon + text rapi */
+    .ts-opt{
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .ts-ic{
+      width: 20px;              /* icon slot tetap */
+      text-align: center;
+      opacity: .75;
+      flex: 0 0 20px;
+    }
+    .ts-txt{
+      flex: 1;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Highlight search (TomSelect kasih <span class="highlight">) */
+    .ts-dropdown .highlight{
+      background: rgba(99,102,241,.18);
+      border-radius: 6px;
+      padding: 0 3px;
+    }
+
+  /* Popover clockpicker selalu di atas SEMUANYA */
+
+  /* Pastikan footer tidak bikin layer menimpa */
+  .footer-minimal{
+    position: relative;  /* z-index baru berlaku kalau ada position */
+    z-index: 1;
+  }
+  .card, .card-body{ overflow: visible !important; }
+  .card{
+    position: relative;
+    overflow: visible;
+    background: rgba(255,255,255,.12);
+  }
+
+  .card::before{
+    pointer-events: none;
+    content:"";
+    position:absolute;
+    inset:0;
+    background: rgba(255,255,255,.18);
+    backdrop-filter: blur(16px);
+    border-radius: inherit; /* ✅ KUNCI */
+    z-index: -1;
+    pointer-events: none;
+  }
