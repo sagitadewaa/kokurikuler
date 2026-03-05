@@ -130,190 +130,141 @@ href="assets/img/Logo.png">
 <!-- JS External -->
 <!-- <script src="assets/js/input-ekstra.js"></script> -->
   <script>
+  // URL Cloudflare Worker kamu
+  const API = "https://kokurikuler-api.dewaa314.workers.dev";
 
-const API = "https://script.google.com/macros/s/AKfycbx0aaTadioEPS6ALRjB6j5yhtw-CPn_ZotI_wZmbghchPc2t27o0BCrbYYCcRQbcdII-A/exec";
+  // Inisialisasi TomSelect
+  let tsRombel = null;
+  let tsSiswa  = null;
+  let tsEkskul = null;
 
-let tsRombel = null;
-let tsSiswa  = null;
-let tsEkskul = null;
+  // Fungsi universal untuk memanggil API melalui Cloudflare Worker
+  async function api(action, data = {}) {
+    const formData = new URLSearchParams();
+    formData.append("action", action);
 
+    Object.keys(data).forEach(key => {
+      formData.append(key, data[key]);
+    });
 
-/* =========================
-   GENERIC API CALL
-========================= */
-async function api(action, data = {}) {
+    try {
+      const res = await fetch(API, {
+        method: "POST",
+        body: formData
+      });
 
-  const formData = new URLSearchParams();
-  formData.append("action", action);
+      if (!res.ok) throw new Error("Network response was not ok");
 
-  Object.keys(data).forEach(key=>{
-    formData.append(key,data[key]);
-  });
-
-  const res = await fetch(API,{
-    method:"POST",
-    body:formData
-  });
-
-  return await res.json();
-}
-
-
-/* =========================
-   PAGE LOAD
-========================= */
-async function onLoad(){
-
-  showLoading(true);
-
-  try{
-
-    const rombel = await api("getRombel");
-    populateRombel(rombel);
-
-    const ekskul = await api("getEkskul");
-    populateEkskul(ekskul);
-
-  }catch(err){
-
-    console.error(err);
-    Swal.fire("Error","Gagal mengambil data dari server","error");
-
+      return await res.json();
+    } catch (err) {
+      console.error("API Error:", err);
+      Swal.fire("Error", "Gagal menghubungi server", "error");
+      return null;
+    }
   }
 
-  showLoading(false);
+  // Fungsi yang dijalankan saat halaman load
+  async function onLoad() {
+    showLoading(true);
 
-}
+    const rombel = await api("getRombel");
+    if (rombel) populateRombel(rombel);
 
+    const ekskul = await api("getEkskul");
+    if (ekskul) populateEkskul(ekskul);
 
-/* =========================
-   ROMBEL
-========================= */
-function populateRombel(list){
+    showLoading(false);
+  }
 
-  const el = document.getElementById("rombel");
+  // Populate dropdown Rombel
+  function populateRombel(list) {
+    const el = document.getElementById("rombel");
+    el.innerHTML = '<option value="" disabled selected>Pilih Kelas</option>';
 
-  el.innerHTML = '<option value="" disabled selected>Pilih Kelas</option>';
+    list.forEach(val => {
+      el.innerHTML += `<option value="${val}">${val}</option>`;
+    });
 
-  list.forEach(val=>{
-    el.innerHTML += `<option value="${val}">${val}</option>`;
-  });
+    tsRombel = new TomSelect(el, {
+      plugins:["clear_button"]
+    });
 
-  if(tsRombel) tsRombel.destroy();
+    tsRombel.on("change", async function(value){
+      if(!value) return;
+      showLoading(true);
+      const siswa = await api("getSiswaByRombel", {rombel:value});
+      showLoading(false);
+      if(siswa) populateSiswa(siswa);
+    });
+  }
 
-  tsRombel = new TomSelect(el,{
-    plugins:["clear_button"]
-  });
+  // Populate dropdown Siswa
+  function populateSiswa(list) {
+    const el = document.getElementById("siswa");
+    el.innerHTML = '<option value="" disabled selected>Pilih Siswa</option>';
 
+    list.forEach(val => {
+      el.innerHTML += `<option value="${val}">${val}</option>`;
+    });
 
-  tsRombel.on("change",async function(value){
+    tsSiswa = new TomSelect(el, {
+      plugins:["clear_button"]
+    });
+  }
 
-    if(!value) return;
+  // Populate dropdown Ekskul
+  function populateEkskul(list) {
+    const el = document.getElementById("ekskul");
+    el.innerHTML = '<option value="" disabled selected>Pilih Ekskul</option>';
+
+    list.forEach(item => {
+      el.innerHTML += `<option value="${item.id}">${item.nama}</option>`;
+    });
+
+    tsEkskul = new TomSelect(el, {
+      plugins:["clear_button"]
+    });
+  }
+
+  // Submit data
+  async function submitData() {
+    const rombel = document.getElementById("rombel").value;
+    const siswa = document.getElementById("siswa").value;
+    const ekskulId = document.getElementById("ekskul").value;
+
+    if(!rombel || !siswa || !ekskulId){
+      Swal.fire("Data belum lengkap","","warning");
+      return;
+    }
 
     showLoading(true);
 
-    const siswa = await api("getSiswaByRombel",{rombel:value});
+    const res = await api("inputData", {
+      rombel,
+      siswa,
+      ekskulId
+    });
 
     showLoading(false);
 
-    populateSiswa(siswa);
+    if(!res) return;
 
-  });
+    if(res.status === "duplicate"){
+      Swal.fire("Data Sudah Ada",res.message,"warning");
+      return;
+    }
 
-}
-
-
-/* =========================
-   SISWA
-========================= */
-function populateSiswa(list){
-
-  const el = document.getElementById("siswa");
-
-  el.innerHTML = '<option value="" disabled selected>Pilih Siswa</option>';
-
-  list.forEach(val=>{
-    el.innerHTML += `<option value="${val}">${val}</option>`;
-  });
-
-  if(tsSiswa) tsSiswa.destroy();
-
-  tsSiswa = new TomSelect(el,{
-    plugins:["clear_button"]
-  });
-
-}
-
-
-/* =========================
-   EKSKUL
-========================= */
-function populateEkskul(list){
-
-  const el = document.getElementById("ekskul");
-
-  el.innerHTML = '<option value="" disabled selected>Pilih Ekskul</option>';
-
-  list.forEach(item=>{
-    el.innerHTML += `<option value="${item.id}">${item.nama}</option>`;
-  });
-
-  if(tsEkskul) tsEkskul.destroy();
-
-  tsEkskul = new TomSelect(el,{
-    plugins:["clear_button"]
-  });
-
-}
-
-
-/* =========================
-   SUBMIT
-========================= */
-async function submitData(){
-
-  const rombel   = document.getElementById("rombel").value;
-  const siswa    = document.getElementById("siswa").value;
-  const ekskulId = document.getElementById("ekskul").value;
-
-  if(!rombel || !siswa || !ekskulId){
-    Swal.fire("Data belum lengkap","","warning");
-    return;
+    Swal.fire("Berhasil",res.message,"success");
+    location.reload();
   }
 
-  showLoading(true);
-
-  const res = await api("inputData",{
-    rombel,
-    siswa,
-    ekskulId
-  });
-
-  showLoading(false);
-
-
-  if(res.status === "duplicate"){
-    Swal.fire("Data Sudah Ada",res.message,"warning");
-    return;
+  // Loading overlay
+  function showLoading(show){
+    document.getElementById("loading").style.display = show ? "flex" : "none";
   }
 
-  Swal.fire("Berhasil",res.message,"success");
-
-  location.reload();
-
-}
-
-
-/* =========================
-   LOADING
-========================= */
-function showLoading(show){
-
-  document.getElementById("loading").style.display =
-    show ? "flex" : "none";
-
-}
-
+  // Jalankan saat halaman load
+  window.addEventListener("DOMContentLoaded", onLoad);
 </script>
 
 </body>
