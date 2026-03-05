@@ -165,7 +165,7 @@ href="assets/img/Logo.png">
 
   // Fungsi yang dijalankan saat halaman load
   async function onLoad() {
-    showLoading(true);
+    // showLoading(true);
 
     const rombel = await api("getRombel");
     if (rombel) populateRombel(rombel);
@@ -173,7 +173,7 @@ href="assets/img/Logo.png">
     const ekskul = await api("getEkskul");
     if (ekskul) populateEkskul(ekskul);
 
-    showLoading(false);
+    // showLoading(false);
   }
 
   // Populate dropdown Rombel
@@ -191,9 +191,9 @@ href="assets/img/Logo.png">
 
     tsRombel.on("change", async function(value){
       if(!value) return;
-      showLoading(true);
+      // showLoading(true);
       const siswa = await api("getSiswaByRombel", {rombel:value});
-      showLoading(false);
+      // showLoading(false);
       if(siswa) populateSiswa(siswa);
     });
   }
@@ -237,7 +237,7 @@ href="assets/img/Logo.png">
       return;
     }
 
-    showLoading(true);
+    // showLoading(true);
 
     const res = await api("inputData", {
       rombel,
@@ -245,7 +245,7 @@ href="assets/img/Logo.png">
       ekskulId
     });
 
-    showLoading(false);
+    // showLoading(false);
 
     if(!res) return;
 
